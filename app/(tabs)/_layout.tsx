@@ -5,6 +5,9 @@ export default function Tabs(){
         <Stack>
             <Stack.Screen name="index" options={{headerShown: false}}/>
             <Stack.Screen name="login" options={{ headerShown: false}} />
+            <Stack.Screen name="forgot" options={{ headerShown: false}} />
+            <Stack.Screen name="verify" options={{ headerShown: false}} />
+            <Stack.Screen name="updatepass" options={{ headerShown: false}} />
             <Stack.Screen name="home" options={{ headerTitle: 'Home'}} />
         </Stack>
     );

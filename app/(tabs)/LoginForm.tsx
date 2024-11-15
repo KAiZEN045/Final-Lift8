@@ -23,7 +23,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitch }) => {
       // Navigate to Home page
       navigation.navigate('home');
     } catch (error) {
-      Alert.alert('Error', 'An error occurred during sign-in.');
+      Alert.alert('Error', 'Invalid Credentials');
     }
   };
 
@@ -57,7 +57,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitch }) => {
         secureTextEntry
         placeholderTextColor="#aaa"
       />
-      <TouchableOpacity onPress={() => Alert.alert('Forgot Password', 'Reset password feature coming soon!')}>
+      <TouchableOpacity onPress={() => navigation.navigate('forgot')}>
         <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
       </TouchableOpacity>
       
