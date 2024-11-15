@@ -1,7 +1,6 @@
 import React from 'react';
-import { SafeAreaView, Text, StatusBar, StyleSheet, TouchableOpacity } from 'react-native';
+import { SafeAreaView, Text, StatusBar, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
 const App: React.FC = () => {
   const navigation = useNavigation();
 
@@ -13,18 +12,26 @@ const App: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
       {/* Logo Text */}
-      <Text style={styles.logoText}>Lift8</Text>
+      <Text style={styles.logoText}>
+  <Text style={styles.logoLift}>LIFT</Text>
+  <Text style={styles.logoEight}>8</Text>
+</Text>
+      <Image source={require('../assets/images/gt.png')} style={styles.image} />
       {/* Welcome Message */}
-      <Text style={styles.welcomeText}>Welcome to Lift8, your transportation platform.</Text>
+      <Text style={styles.welcomeText}>Haul Smarter, {'\n'}Go Farther </Text>
+      <Text style={styles.welcomeSub}>On Your Terms, every{'\n'}mile</Text>
       {/* Get Started Button */}
       <TouchableOpacity style={styles.button} onPress={handleGetStarted}>
-        <Text style={styles.buttonText}>Get Started</Text>
+        <Text style={styles.buttonText}>Let's Go</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  image:{
+    bottom: '5%'
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -33,18 +40,32 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   logoText: {
-    fontSize: 40,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 20,
-    fontFamily: 'PoppinsBold',
+    fontSize: 62,
+    color: '#0c2c47',
+    bottom: '5%',
+    flexDirection: 'row',
+  },
+  logoLift: {
+    fontFamily: 'PoppinsSemiBold', // Semi-bold font style
+  },
+  logoEight: {
+    fontFamily: 'PoppinsItalic', // Italic font style
   },
   welcomeText: {
-    fontSize: 18,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 40,
-    fontFamily: 'PoppinsRegular',
+    fontSize: 50,
+    color: '#303575',
+    textAlign: 'left',
+    paddingLeft: '10%',
+    alignItems: 'flex-start',
+    fontFamily: 'PoppinsSemiBold',
+    width: '100%',
+  },
+  welcomeSub:{
+    fontSize: 22,
+    textAlign: 'left',
+    paddingLeft: '10%',
+    alignItems: 'flex-start',
+    width: '100%'
   },
   button: {
     position: 'absolute',
@@ -53,6 +74,8 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 10,
+    width:'80%',
+    alignItems: 'center'
   },
   buttonText: {
     color: '#fff',
