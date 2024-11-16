@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
+import { useNavigation } from '@react-navigation/native';
 
 const User1Page: React.FC = () => {
   const [location, setLocation] = useState<any>(null);
   const [errorMsg, setErrorMsg] = useState<string>('');
-  const [selectedTab, setSelectedTab] = useState<string>('Truck'); // Default tab
+  const [selectedTab, setSelectedTab] = useState<string>('Truck');
+  const navigation = useNavigation();
 
   useEffect(() => {
     let locationSubscription: any = null;
@@ -39,15 +41,17 @@ const User1Page: React.FC = () => {
     };
   }, []);
 
+  const handleTruckSelection = (type: string) => {
+    // Navigate to the TruckListScreen and pass the selected truck type
+    navigation.navigate('trucklist', { truckType: type });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-
-      {/* Display Error Message if Permission Denied */}
       {errorMsg ? (
         <Text style={styles.errorText}>{errorMsg}</Text>
       ) : (
         <>
-          {/* Show Map if Location is Available */}
           {location && (
             <MapView
               style={styles.map}
@@ -64,9 +68,7 @@ const User1Page: React.FC = () => {
             </MapView>
           )}
 
-          {/* Bottom Card with Tab Navigation */}
           <View style={styles.bottomCard}>
-            {/* Tab Options */}
             <View style={styles.tabContainer}>
               <TouchableOpacity onPress={() => setSelectedTab('Share Load')}>
                 <Text style={[styles.tabText, selectedTab === 'Share Load' && styles.activeTab]}>Share Load</Text>
@@ -79,31 +81,30 @@ const User1Page: React.FC = () => {
               </TouchableOpacity>
             </View>
 
-            {/* Content Based on Selected Tab */}
             <View style={styles.contentContainer}>
               {selectedTab === 'Share Load' && (
                 <>
                   <Text style={styles.contentTitle}>Share Load</Text>
-                  <Text>Find available loads to share with others.</Text>
+                  <Text style={styles.contentTitle1}>Find available loads to share with others.</Text>
                 </>
               )}
               {selectedTab === 'Truck' && (
                 <>
                   <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.openButton}>
+                    <TouchableOpacity style={styles.openButton} onPress={() => handleTruckSelection('Open')}>
                       <Text style={styles.buttonText1}>Open</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.closedButton}>
+                    <TouchableOpacity style={styles.closedButton} onPress={() => handleTruckSelection('Closed')}>
                       <Text style={styles.buttonText}>Close</Text>
                     </TouchableOpacity>
                   </View>
-                  <Text style= {styles.txt}>To ensure a smooth continuation of your process, please select an option.</Text>
+                  <Text style={styles.txt}>To ensure a smooth continuation of your process, please select an option.</Text>
                 </>
               )}
               {selectedTab === 'Documents' && (
                 <>
                   <Text style={styles.contentTitle}>Documents</Text>
-                  <Text>Upload or manage your transport documents.</Text>
+                  <Text style={styles.contentTitle1}>Upload or manage your transport documents.</Text>
                 </>
               )}
             </View>
@@ -115,10 +116,10 @@ const User1Page: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    txt:{
-        fontSize: 14,
-        fontFamily: 'PoppinsRegular'
-    },
+  txt: {
+    fontSize: 14,
+    fontFamily: 'PoppinsRegular',
+  },
   container: {
     flex: 1,
     justifyContent: 'flex-start',
@@ -139,7 +140,7 @@ const styles = StyleSheet.create({
   },
   bottomCard: {
     width: '90%',
-    height: 200,
+    height: 210,
     position: 'absolute',
     bottom: 20,
     backgroundColor: '#fff',
@@ -161,7 +162,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#888',
-    fontFamily: 'Poppins'
+    fontFamily: 'Poppins',
   },
   activeTab: {
     color: '#000',
@@ -176,12 +177,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+    alignSelf: 'center',
+    fontFamily: 'PoppinsBold'
+  },
+  contentTitle1: {
+    fontSize: 18,
+    marginBottom: 10,
+    alignSelf: 'center',
+    fontFamily: 'PoppinsRegular'
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginVertical: 10,
-    marginBottom: 30
+    marginBottom: 30,
   },
   openButton: {
     borderColor: '#141632',
@@ -201,12 +210,12 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontFamily: 'PoppinsBold'
+    fontFamily: 'PoppinsBold',
   },
   buttonText1: {
     color: '#141632',
     fontWeight: 'bold',
-    fontFamily: 'PoppinsBold'
+    fontFamily: 'PoppinsBold',
   },
 });
 

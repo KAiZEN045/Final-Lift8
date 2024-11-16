@@ -69,14 +69,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: '#141632',
     margin: 15,
+    fontFamily: 'PoppinsBold'
   },
   subText: {
     fontSize: 16,
     marginBottom: 25,
-    color: '#000',
+    color: '#141632',
     alignSelf: 'flex-start',
     margin: 15,
     marginTop: 0,
+    fontFamily: 'PoppinsRegular'
   },
   buttonContainer: {
     flexDirection: 'row', // Aligns buttons side by side
