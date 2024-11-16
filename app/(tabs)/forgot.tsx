@@ -40,7 +40,11 @@ const EmailOtpScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Email OTP Verification</Text>
+      <Text style={styles.logoText}>
+  <Text style={styles.logoLift}>LIFT</Text>
+  <Text style={styles.logoEight}>8</Text>
+</Text>
+      <Text style={styles.headerText}>Email Verification</Text>
       <TextInput
         style={styles.input}
         placeholder="Enter your email"
@@ -62,6 +66,19 @@ const EmailOtpScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  logoText: {
+    fontSize: 62,
+    color: '#0c2c47',
+    bottom: '10%',
+    flexDirection: 'row',
+    alignSelf: 'center'
+  },
+  logoLift: {
+    fontFamily: 'PoppinsSemiBold', // Semi-bold font style
+  },
+  logoEight: {
+    fontFamily: 'PoppinsItalic', // Italic font style
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -71,21 +88,25 @@ const styles = StyleSheet.create({
     fontSize: 22,
     marginBottom: 20,
     textAlign: 'center',
+    fontFamily: 'PoppinsSemiBold',
+    color: '#141632',
+    bottom: '10%'
   },
   input: {
     width: '100%',
     height: 50,
     padding: 12,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    backgroundColor: '#E6E6E6',
     borderRadius: 8,
     marginBottom: 20,
+    bottom: '10%',
   },
   button: {
     backgroundColor: '#141632',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
+    bottom: '10%'
   },
   buttonDisabled: {
     backgroundColor: '#888',
@@ -93,6 +114,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 17,
+    fontFamily: 'PoppinsSemiBold'
   },
 });
 

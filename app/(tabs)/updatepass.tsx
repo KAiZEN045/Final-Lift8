@@ -41,7 +41,8 @@ const UpdatePasswordScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Update Your Password</Text>
+      <Text style={styles.headerText}>Create New Password</Text>
+      <Text style={styles.text}>It must be different from previously{'\n'}used password</Text>
       <TextInput
         style={styles.input}
         placeholder="New Password"
@@ -72,26 +73,37 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 22,
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: 'left',
+    bottom: '20%',
+    fontFamily: 'PoppinsSemiBold',
+    color:'#141632'
+  },
+  text: {
+    fontSize: 16,
+    marginBottom: 20,
+    fontFamily: 'PoppinsRegular',
+    bottom: '21%',
   },
   input: {
     width: '100%',
     height: 50,
     padding: 12,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    backgroundColor: '#e6e6e6',
     borderRadius: 8,
     marginBottom: 20,
+    bottom: '20%'
   },
   button: {
     backgroundColor: '#141632',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
+    bottom: '20%'
   },
   buttonText: {
     color: '#fff',
     fontSize: 17,
+    fontFamily: 'PoppinsSemiBold'
   },
 });
 
