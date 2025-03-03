@@ -92,10 +92,10 @@ const User1Page: React.FC = () => {
                 <>
                   <View style={styles.buttonContainer}>
                     <TouchableOpacity style={styles.openButton} onPress={() => handleTruckSelection('Open')}>
-                      <Text style={styles.buttonText1}>Open</Text>
+                      <Text style={styles.buttonText1}>Light Weight</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.closedButton} onPress={() => handleTruckSelection('Closed')}>
-                      <Text style={styles.buttonText}>Close</Text>
+                      <Text style={styles.buttonText}>Heavy Weight</Text>
                     </TouchableOpacity>
                   </View>
                   <Text style={styles.txt}>To ensure a smooth continuation of your process, please select an option.</Text>
