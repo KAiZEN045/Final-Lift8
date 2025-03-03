@@ -38,7 +38,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSwitch }) => {
 
       // Create the user with Supabase auth
       const { 
-        data:{session},
+        data,
          error } = await supabase.auth.signUp({ email: emailnew, password: passwordnew });
       if (error) {
         console.error('Supabase SignUp Error:', error);
@@ -46,16 +46,12 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSwitch }) => {
         return;
       }
 
-      if(session){
-        navigation.navigate('login')
-      }
-
       const user = data?.user;
       if (user) {
         // Save additional user data to the "profiles" table
         const { error: profileError } = await supabase
           .from('profiles')
-          .insert([{ user_id: user.id, first_name: firstName, last_name: lastName }]);
+          .insert([{ user_id: user.id, firstName: firstName, lastName: lastName }]);
 
         if (profileError) {
           console.error('Supabase Profile Insert Error:', profileError);
@@ -80,7 +76,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSwitch }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View>
       <Text style={styles.headerText}>Welcome to Lift8</Text>
       <Text style={styles.subHeaderText}>Ready to simplify your truck booking experience</Text>
 
@@ -158,41 +154,46 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 20,
-    backgroundColor: '#f7f7f7', // Light background color
+    backgroundColor: '#F7F7F7',  // Lighter background for better contrast
   },
   headerText: {
-    fontSize: 26,
+    fontSize: 30,  // Increased font size for a more prominent heading
     fontFamily: 'Poppins-Bold',
-    color: '#303575',
-    textAlign: 'center',
-    marginBottom: 10,
+    color: '#303575',  // Accent color
+    textAlign: 'left',
+    marginBottom: 15,  // Slightly more space between header and subheader
   },
   subHeaderText: {
     fontSize: 16,
     fontFamily: 'Poppins-Regular',
-    color: '#7D7D7D',
-    textAlign: 'center',
-    marginBottom: 30,
+    color: '#6B7280',  // Soft text color for a less harsh look
+    textAlign: 'left',
+    marginBottom: 40,  // More space to create a clear visual separation from the inputs
   },
   input: {
     width: '100%',
-    height: 50,
+    height: 55,  // Slightly larger input field for better usability
     paddingLeft: 15,
     paddingRight: 15,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
-    marginBottom: 15,
+    borderColor: '#D1D5DB',  // Light gray for the input border
+    borderRadius: 10,  // Rounded corners for a softer look
+    marginBottom: 20,  // More space between inputs for better readability
     fontSize: 16,
     fontFamily: 'Poppins-Regular',
     backgroundColor: '#FFF',
+    shadowColor: '#000',  // Subtle shadow to lift the inputs off the background
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
   },
   button: {
-    backgroundColor: '#141632',
+    backgroundColor: '#303575',  // Primary color for action buttons
     paddingVertical: 15,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: 'center',
     width: '100%',
+    elevation: 3,  // Shadow effect for elevation and depth
   },
   buttonText: {
     color: '#FFF',
@@ -200,12 +201,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-SemiBold',
   },
   toggleText: {
-    color: '#141632',
+    color: '#303575',
     fontSize: 14,
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: 25,  // More space between the button and the toggle link
     textDecorationLine: 'underline',
   },
 });
+
 
 export default SignUpForm;
