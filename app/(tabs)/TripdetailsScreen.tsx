@@ -83,28 +83,30 @@ const TripDetailsScreen: React.FC = () => {
       alert("Please fill in all fields.");
       return;
     }
-
-    const enteredWeight = parseInt(weight, 10);
+  
+    const enteredWeight = Number(weight);
     if (isNaN(enteredWeight) || enteredWeight <= 0) {
       alert("Weight must be a valid positive number.");
       return;
     }
-
+  
     if (enteredWeight > selectedTruck.capacity) {
       alert("Exceeds truck capacity.");
       return;
     }
-
+  
     const calculatedDistance = await fetchDistance();
-    if (calculatedDistance !== null) {
-      const estimatedCost =
-        selectedTruck.baseFare +
-        calculatedDistance * selectedTruck.perKmRate +
-        enteredWeight * selectedTruck.perKgRate;
-      setEstimate(estimatedCost);
-      setShowEstimateModal(true);
-    }
+    if (calculatedDistance === null) return;
+  
+    const estimatedCost =
+      selectedTruck.baseFare +
+      (calculatedDistance || 0) * selectedTruck.perKmRate +
+      enteredWeight * selectedTruck.perKgRate;
+  
+    setEstimate(estimatedCost);
+    setShowEstimateModal(true);
   };
+  
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -131,6 +133,7 @@ const TripDetailsScreen: React.FC = () => {
             <TextInput
               style={styles.input}
               placeholder="Enter from location"
+              placeholderTextColor={"#777"}
               value={fromLocation}
               onChangeText={(text) => {
                 setFromLocation(text);
@@ -156,6 +159,7 @@ const TripDetailsScreen: React.FC = () => {
             <TextInput
               style={styles.input}
               placeholder="Enter drop location"
+              placeholderTextColor={"#777"}
               value={dropLocation}
               onChangeText={(text) => {
                 setDropLocation(text);
@@ -175,12 +179,24 @@ const TripDetailsScreen: React.FC = () => {
             />
           )}
 
-          {/* Weight */}
+          {/* Description */}
           <View style={styles.inputContainer}>
             <Ionicons name="cube" size={20} color="#555" style={styles.icon} />
             <TextInput
               style={styles.input}
               placeholder="Enter weight (kg)"
+              placeholderTextColor={"#777"}
+              value={description}
+              onChangeText={setDescription}
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Ionicons name="clipboard" size={20} color="#555" style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Enter weight (kg)"
+              placeholderTextColor={"#777"}
               keyboardType="numeric"
               value={weight}
               onChangeText={setWeight}
