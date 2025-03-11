@@ -1,26 +1,53 @@
-import React from 'react';
-import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { supabase } from './supabase'; // Import Supabase client
+
+// Define route params type for better TypeScript support
+type RouteParams = {
+  truckType?: string;
+};
 
 const TruckListScreen: React.FC = () => {
-  const route = useRoute();
+  const route = useRoute<RouteProp<Record<string, RouteParams>, string>>();
   const navigation = useNavigation();
-  const { truckType = '' } = route.params || {};
 
-  const trucks: Record<string, { id: string; name: string; capacity: number; image: any }[]> = {
-    Open: [
-      { id: '1', name: 'E-loader', capacity: 350, image: require('../assets/images/e_loader.png') },
-      { id: '2', name: '3 Wheeler', capacity: 500, image: require('../assets/images/3_wheeler.png') },
-      { id: '3', name: 'Tata Ace', capacity: 750, image: require('../assets/images/tata_ace.png') }
-    ],
-    Closed: [
-      { id: '4', name: 'Mini Van', capacity: 1250, image: require('../assets/images/Pickup_8ft.png') },
-      { id: '5', name: 'Box Truck', capacity: 1700, image: require('../assets/images/Pickup_9ft.png') },
-      { id: '6', name: 'Tata 407', capacity: 2500, image: require('../assets/images/tata-407.png') },
-      { id: '7', name: 'Pickup 14ft', capacity: 3500, image: require('../assets/images/Pickup_14ft.png') },
-    ]
-  };
+  // Ensure truckType is valid, otherwise use an empty string
+  const truckType = route.params?.truckType || '';
+
+  const [trucks, setTrucks] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTrucks = async () => {
+      setLoading(true);
+  
+      console.log("Selected Truck Type:", truckType); // Debugging log
+  
+      if (!truckType) {
+        console.warn("No truck type selected");
+        setLoading(false);
+        return;
+      }
+  
+      const { data, error } = await supabase
+        .from('trucks')
+        .select('*')
+        .eq('type', truckType); // Filter by truck type
+  
+      if (error) {
+        console.error('Error fetching trucks:', error.message);
+        Alert.alert("Error", "Failed to fetch truck data.");
+      } else {
+        console.log("Fetched Trucks:", data); // Debugging log
+        setTrucks(data || []); // Ensure empty array if data is null
+      }
+      setLoading(false);
+    };
+  
+    fetchTrucks();
+  }, [truckType]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -33,19 +60,21 @@ const TruckListScreen: React.FC = () => {
         </View>
       </View>
 
-      {trucks[truckType] ? (
+      {loading ? (
+        <ActivityIndicator size="large" color="#141632" style={{ marginTop: 20 }} />
+      ) : trucks.length > 0 ? (
         <FlatList
-          data={trucks[truckType]}
-          keyExtractor={(item) => item.id}
+          data={trucks}
+          keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.truckCard}
               onPress={() => navigation.navigate('TripdetailsScreen', { selectedTruck: item })}
             >
-              <Image source={item.image} style={styles.truckImage} />
+              <Image source={{ uri: item.image_url || 'https://via.placeholder.com/80' }} style={styles.truckImage} />
               <View style={styles.textContainer}>
-                <Text style={styles.truckName}>{item.name}</Text>
-                <Text style={styles.truckCapacity}>Max Capacity: {item.capacity} kg</Text>
+                <Text style={styles.truckName}>{item.name || 'Unknown Truck'}</Text>
+                <Text style={styles.truckCapacity}>Max Capacity: {item.capacity || 'N/A'} kg</Text>
               </View>
             </TouchableOpacity>
           )}
