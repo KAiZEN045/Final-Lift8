@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, FlatList, ActivityIndicator, Modal } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -27,46 +27,83 @@ const TripDetailsScreen: React.FC = () => {
   const [fromSuggestions, setFromSuggestions] = useState<string[]>([]);
   const [dropSuggestions, setDropSuggestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showEstimateModal, setShowEstimateModal] = useState(false);
 
-  useEffect(() => {
-    if (from && drop) {
-      setLoading(true);
-      fetch(`https://gomaps.pro/api/distance?from=${encodeURIComponent(from)}&to=${encodeURIComponent(drop)}`)
-        .then(response => response.json())
-        .then(data => {
-          setDistance(data.distance);
-          setLoading(false);
-        })
-        .catch(error => {
-          console.error('Error fetching distance:', error);
-          setLoading(false);
-        });
-    }
-  }, [from, drop]);
+    // Fetch location suggestions
+    const fetchLocationSuggestions = async (input: string, setSuggestions: React.Dispatch<React.SetStateAction<string[]>>) => {
+      if (!input) {
+        setSuggestions([]);
+        return;
+      }
+      try {
+        const response = await fetch(
+          `https://maps.gomaps.pro/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&key=AlzaSy7qYPQQchhwiMbyXmTeCZGWGhk7Cz706XR&components=country:in`
+        );
+        const data = await response.json();
+        setSuggestions(data.predictions.map((item: any) => item.description).slice(0, 3));
+      } catch (error) {
+        console.error("Error fetching location suggestions:", error);
+      }
+    };
 
-  const fetchLocationSuggestions = (query: string, setSuggestions: (suggestions: string[]) => void) => {
-    if (query.length < 3) return;
-    fetch(`https://gomaps.pro/api/autocomplete?q=${encodeURIComponent(query)}`)
-      .then(response => response.json())
-      .then(data => setSuggestions(data.suggestions || []))
-      .catch(error => console.error('Error fetching location suggestions:', error));
+    
+  // Handle selecting a suggestion
+  const handleSelectSuggestion = (text: string, setText: React.Dispatch<React.SetStateAction<string>>, setSuggestions: React.Dispatch<React.SetStateAction<string[]>>) => {
+    setText(text);
+    setSuggestions([]); // Hide suggestions
   };
 
-  const calculateEstimate = () => {
-    if (distance === null || isNaN(distance) || distance <= 0) {
-      alert('Invalid distance. Please check the locations entered.');
+  // Fetch distance
+  const fetchDistance = async () => {
+    try {
+      const response = await fetch(
+        `https://maps.gomaps.pro/maps/api/distancematrix/json?origins=${encodeURIComponent(from)}&destinations=${encodeURIComponent(drop)}&key=AlzaSy7qYPQQchhwiMbyXmTeCZGWGhk7Cz706XR`
+      );
+      const data = await response.json();
+
+      if (!data.rows || !data.rows[0].elements || data.rows[0].elements[0].status !== "OK") {
+        alert("Unable to fetch distance. Please check your locations.");
+        return null;
+      }
+
+      const distanceInKm = data.rows[0].elements[0].distance.value / 1000;
+      setDistance(distanceInKm);
+      return distanceInKm;
+    } catch (error) {
+      alert("Network issue. Please try again.");
+      console.error("Error fetching distance:", error);
+      return null;
+    }
+  };
+
+  const calculateEstimate = async () => {
+    if (!from || !drop) {
+      alert("Please enter both From and Drop locations.");
       return;
     }
-    
+  
+    setLoading(true);
+  
+    const distanceInKm = await fetchDistance();
+    if (distanceInKm === null || isNaN(distanceInKm) || distanceInKm <= 0) {
+      alert("Invalid distance. Please check the locations entered.");
+      setLoading(false);
+      return;
+    }
+  
     const wt = parseFloat(weight);
     if (isNaN(wt) || wt <= 0 || wt > selectedTruck.capacity) {
       alert(`Invalid weight. Max allowed: ${selectedTruck.capacity} kg`);
+      setLoading(false);
       return;
     }
-    
-    const cost = selectedTruck.baseFare + distance * selectedTruck.perKmRate + wt * selectedTruck.perKgRate;
+  
+    const cost = selectedTruck.baseFare + distanceInKm * selectedTruck.perKmRate + wt * selectedTruck.perKgRate;
     setEstimatedCost(cost);
+    setLoading(false);
+    setShowEstimateModal(true);
   };
+  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -125,18 +162,29 @@ const TripDetailsScreen: React.FC = () => {
         <TextInput style={styles.input} placeholder="Enter Weight (kg)" keyboardType="numeric" value={weight} onChangeText={setWeight} />
         <TextInput style={styles.input} placeholder="Description" value={description} onChangeText={setDescription} />
         
-        <TouchableOpacity style={styles.button} onPress={calculateEstimate}>
-          <Text style={styles.buttonText}>Get Estimate</Text>
-        </TouchableOpacity>
-        
-        {loading && <ActivityIndicator size="large" color="#007AFF" />}
+        {loading ? (
+          <ActivityIndicator size="large" color="#007AFF" />
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={calculateEstimate}>
+            <Text style={styles.buttonText}>{estimatedCost === null ? "Get Estimate" : "Book Truck"}</Text>
+          </TouchableOpacity>
+        )}
       </View>
       
-      {estimatedCost !== null && (
-        <View style={styles.estimateContainer}>
-          <Text style={styles.estimateText}>Estimated Cost: ₹{estimatedCost.toFixed(2)}</Text>
+       {/* Estimate Modal */}
+       <Modal visible={showEstimateModal} transparent animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Estimated Cost</Text>
+            <Text style={styles.modalTruck}>{selectedTruck.name} (Max {selectedTruck.capacity} kg)</Text>
+            <Text style={styles.modalCost}>₹{estimatedCost?.toFixed(2)}</Text>
+            <TouchableOpacity style={styles.closeButton} onPress={() => setShowEstimateModal(false)}>
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      )}
+      </Modal>
+
     </SafeAreaView>
   );
 };
@@ -155,6 +203,13 @@ const styles = StyleSheet.create({
   suggestion: { padding: 10, borderBottomWidth: 1, borderBottomColor: '#ccc', backgroundColor: '#fff' },
   button: { backgroundColor: '#141632', padding: 15, borderRadius: 8, alignItems: 'center', marginTop: 10 },
   buttonText: { fontSize: 16, color: '#fff', fontWeight: 'bold' },
+  modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
+  modalContent: { backgroundColor: '#fff', padding: 20, borderRadius: 10, width: '80%', alignItems: 'center' },
+  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
+  modalTruck: { fontSize: 16, marginBottom: 5 },
+  modalCost: { fontSize: 22, fontWeight: 'bold', color: '#007AFF' },
+  closeButton: { marginTop: 10, backgroundColor: '#141632', padding: 10, borderRadius: 5 },
+  closeButtonText: { color: '#fff', fontSize: 16 },
 });
 
 export default TripDetailsScreen;
