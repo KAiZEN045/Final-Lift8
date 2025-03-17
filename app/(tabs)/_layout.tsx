@@ -12,6 +12,7 @@ export default function Tabs(){
             <Stack.Screen name="user1" options={{ headerShown: false}} />
             <Stack.Screen name="trucklist" options={{ headerShown: false}} />
             <Stack.Screen name="TripdetailsScreen" options={{ headerShown: false}} />
+            <Stack.Screen name="ConsumerNegotiationScreen" options={{ headerShown: false}} />
         </Stack>
     );
 }

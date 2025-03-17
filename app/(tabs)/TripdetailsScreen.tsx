@@ -28,6 +28,8 @@ const TripDetailsScreen: React.FC = () => {
   const [dropSuggestions, setDropSuggestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [showEstimateModal, setShowEstimateModal] = useState(false);
+  const [isEstimateFetched, setIsEstimateFetched] = useState(false);
+
 
     // Fetch location suggestions
     const fetchLocationSuggestions = async (input: string, setSuggestions: React.Dispatch<React.SetStateAction<string[]>>) => {
@@ -165,26 +167,47 @@ const TripDetailsScreen: React.FC = () => {
         {loading ? (
           <ActivityIndicator size="large" color="#007AFF" />
         ) : (
-          <TouchableOpacity style={styles.button} onPress={calculateEstimate}>
-            <Text style={styles.buttonText}>{estimatedCost === null ? "Get Estimate" : "Book Truck"}</Text>
-          </TouchableOpacity>
+          <TouchableOpacity
+  style={styles.button}
+  onPress={() => {
+    if (isEstimateFetched) {
+      navigation.navigate('ConsumerNegotiationScreen', {
+        from,
+        drop,
+        estimatedCost,
+      });
+    } else {
+      calculateEstimate();
+    }
+  }}
+>
+  <Text style={styles.buttonText}>
+    {isEstimateFetched ? "Book Truck" : "Get Estimate"}
+  </Text>
+</TouchableOpacity>
+
         )}
       </View>
       
-       {/* Estimate Modal */}
-       <Modal visible={showEstimateModal} transparent animationType="slide">
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Estimated Cost</Text>
-            <Text style={styles.modalTruck}>{selectedTruck.name} (Max {selectedTruck.capacity} kg)</Text>
-            <Text style={styles.modalCost}>₹{estimatedCost?.toFixed(2)}</Text>
-            <TouchableOpacity style={styles.closeButton} onPress={() => setShowEstimateModal(false)}>
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      <Modal visible={showEstimateModal} transparent animationType="slide">
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+      <Text style={styles.modalTitle}>Estimated Cost</Text>
+      
+      <Text style={styles.modalDetails}>From: {from}{"\n"}To: {drop}</Text>
+      
+      <Text style={styles.modalTruck}>{selectedTruck.name} (Max {selectedTruck.capacity} kg)</Text>
+      
+      <Text style={styles.modalDetails}>Weight: {weight} kg</Text>
 
+      <Text style={styles.modalCost}>₹{estimatedCost?.toFixed(2)}</Text>
+
+      <TouchableOpacity style={styles.closeButton} onPress={() => {setShowEstimateModal(false); setIsEstimateFetched(true);}}>
+        <Text style={styles.closeButtonText}>Close</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
     </SafeAreaView>
   );
 };
@@ -203,13 +226,63 @@ const styles = StyleSheet.create({
   suggestion: { padding: 10, borderBottomWidth: 1, borderBottomColor: '#ccc', backgroundColor: '#fff' },
   button: { backgroundColor: '#141632', padding: 15, borderRadius: 8, alignItems: 'center', marginTop: 10 },
   buttonText: { fontSize: 16, color: '#fff', fontWeight: 'bold' },
-  modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
-  modalContent: { backgroundColor: '#fff', padding: 20, borderRadius: 10, width: '80%', alignItems: 'center' },
-  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
-  modalTruck: { fontSize: 16, marginBottom: 5 },
-  modalCost: { fontSize: 22, fontWeight: 'bold', color: '#007AFF' },
-  closeButton: { marginTop: 10, backgroundColor: '#141632', padding: 10, borderRadius: 5 },
-  closeButtonText: { color: '#fff', fontSize: 16 },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)', // Darker overlay
+  },
+  modalContent: {
+    width: '85%',
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+    elevation: 10, // Adds shadow on Android
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    color: '#333',
+    textAlign: 'center',
+  },
+  modalTruck: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#555',
+    marginBottom: 8,
+  },
+  modalDetails: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  modalCost: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#007AFF',
+    marginTop: 10,
+  },
+  closeButton: {
+    marginTop: 15,
+    backgroundColor: '#141632',
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  
 });
 
 export default TripDetailsScreen;
