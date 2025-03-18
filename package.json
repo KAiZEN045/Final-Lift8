@@ -22,7 +22,7 @@
     "@react-navigation/native": "^7.0.0",
     "@rneui/themed": "^4.0.0-rc.8",
     "@supabase/supabase-js": "^2.46.1",
-    "expo": "~52.0.4",
+    "expo": "~52.0.38",
     "expo-blur": "~14.0.1",
     "expo-constants": "~17.0.2",
     "expo-font": "~13.0.1",
@@ -48,7 +48,8 @@
     "react-native-url-polyfill": "^2.0.0",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.13",
-    "react-native-webview": "13.12.2"
+    "react-native-webview": "13.12.2",
+    "undefined": "\\"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
