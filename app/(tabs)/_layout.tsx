@@ -8,6 +8,8 @@ export default function Tabs(){
             <Stack.Screen name="forgot" options={{ headerShown: false}} />
             <Stack.Screen name="verify" options={{ headerShown: false}} />
             <Stack.Screen name="updatepass" options={{ headerShown: false}} />
+            <Stack.Screen name="TruckOwnerPortal" options={{ headerShown: false}} />
+            <Stack.Screen name="UserRequest" options={{ headerShown: false}} />
             <Stack.Screen name="home" options={{ headerShown: false}} />
             <Stack.Screen name="user1" options={{ headerShown: false}} />
             <Stack.Screen name="trucklist" options={{ headerShown: false}} />
